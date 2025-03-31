@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+/* ===================== */
+/* Scrollbar personnalisée */
+/* ===================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9; /* slate-100 */
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937; /* gray-800 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* slate-300 */
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563; /* gray-600 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* slate-400 */
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280; /* gray-500 */
+}
+
+/* ===================== */
+/* Animations */
+/* ===================== */
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 200ms;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 200ms;
+}
+
+/* ===================== */
+/* Layout de base */
+/* ===================== */
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+.page-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+}
+
+/* Assurer que la sidebar reste fixée à l'écran sans défilement */
+aside.sidebar, aside[class*="fixed"] {
+  position: fixed !important;
+  height: 100vh !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  overflow: hidden !important; /* Empêche le défilement */
+}
+
+/* Ajustements pour le mode responsive */
+@media (min-width: 1024px) {
+  .content-wrapper {
+    margin-left: 16rem;
+    width: calc(100% - 16rem);
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+  }
+}
+
+@media (max-width: 1023px) {
+  .content-wrapper {
+    width: 100%;
+    margin-left: 0;
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+  }
+}
+
