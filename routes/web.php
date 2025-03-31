@@ -6,7 +6,7 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Admin\WorkController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\ProjectController;
-use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\NewsletterController;
 
