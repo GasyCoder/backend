@@ -1,0 +1,28 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "backend for my portfolio",
+    "main": "index.js",
+    "type": "module",
+    "directories": {
+        "test": "tests"
+    },
+    "devDependencies": {
+        "@tailwindcss/postcss": "^4.0.17",
+        "autoprefixer": "^10.4.21",
+        "laravel-vite-plugin": "^1.2.0",
+        "postcss": "^8.5.3",
+        "vite": "^6.2.3"
+    },
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "alpinejs": "^3.14.9"
+    }
+}
