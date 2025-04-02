@@ -17,7 +17,7 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
     'allowed_methods' => ['*'],
-   'allowed_origins' => [env('FRONTEND_URL', 'https://me.gasycoder.com')],
+    'allowed_origins' => [env('FRONTEND_URL', 'http://127.0.0.1:5173')],
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
     'exposed_headers' => [],
