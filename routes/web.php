@@ -17,7 +17,7 @@ Route::get('/', function () {
     }
 
     // Sinon, rediriger vers le frontend
-    return redirect(env('FRONTEND_URL', 'http://localhost:5173'));
+    return redirect(env('FRONTEND_URL', 'https://me.gasycoder.com'));
 });
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
