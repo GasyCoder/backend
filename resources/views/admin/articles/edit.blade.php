@@ -25,6 +25,30 @@
         .dark .CodeMirror-cursor {
             border-color: #e5e7eb;
         }
+        
+        /* Styles pour la prévisualisation Markdown */
+        .dark .editor-preview {
+            background-color: #1f2937;
+            color: #e5e7eb;
+        }
+        .dark .editor-preview pre {
+            background-color: #374151;
+            border-color: #4b5563;
+        }
+        .dark .editor-preview-side {
+            background-color: #1f2937;
+            color: #e5e7eb;
+        }
+        
+        /* Amélioration du rendu Markdown */
+        .EasyMDEContainer .CodeMirror {
+            min-height: 250px;
+            height: auto;
+            border-radius: 0.375rem;
+        }
+        .editor-preview-side {
+            border-radius: 0.375rem;
+        }
 
         /* Assurer que les champs de saisie ont une hauteur suffisante */
         input[type="text"],
@@ -77,7 +101,9 @@
 
             <div class="mb-6">
                 <label for="markdown-description" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Description (SEO)</label>
-                <textarea id="markdown-description" name="description" class="w-full text-gray-900 bg-white border-gray-300 rounded shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-indigo-300 dark:focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-500">{{ old('description', $article->description ?? '') }}</textarea>
+                <div class="markdown-editor-container">
+                    <textarea id="markdown-description" name="description" class="w-full text-gray-900 bg-white border-gray-300 rounded shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-indigo-300 dark:focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-500">{{ old('description', $article->description ?? '') }}</textarea>
+                </div>
                 @error('description')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
@@ -85,7 +111,9 @@
 
             <div class="mb-6">
                 <label for="markdown-content" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Contenu (Markdown)</label>
-                <textarea id="markdown-content" name="content" class="w-full text-gray-900 bg-white border-gray-300 rounded shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-indigo-300 dark:focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-500">{{ old('content', $article->content ?? '') }}</textarea>
+                <div class="markdown-editor-container">
+                    <textarea id="markdown-content" name="content" class="w-full text-gray-900 bg-white border-gray-300 rounded shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-indigo-300 dark:focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-500">{{ old('content', $article->content ?? '') }}</textarea>
+                </div>
                 @error('content')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
@@ -123,6 +151,7 @@
                     <div class="mb-2">
                         <img src="{{ $article->cover_image }}" alt="Cover" class="object-cover h-32 border border-gray-200 rounded dark:border-gray-700">
                     </div>
+                    <p class="mt-1 mb-2 text-sm text-gray-500 dark:text-gray-400">Téléchargez une nouvelle image pour remplacer l'image actuelle</p>
                 @endif
                 <input type="file" name="cover_image" id="cover_image" class="w-full py-2 text-gray-900 dark:text-gray-100">
                 @error('cover_image')
@@ -148,31 +177,74 @@
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Configuration commune pour les éditeurs Markdown
+            const commonOptions = {
+                spellChecker: false,
+                autoDownloadFontAwesome: false,
+                autosave: {
+                    enabled: true,
+                    uniqueId: "article-editor-" + "{{ $article->id ?? 'new' }}", 
+                    delay: 1000,
+                },
+                renderingConfig: {
+                    singleLineBreaks: false, 
+                    codeSyntaxHighlighting: true,
+                },
+                sideBySideFullscreen: false,
+                status: ["autosave", "lines", "words"],
+                tabSize: 4,
+            };
+            
             // Éditeur Markdown pour la description (configuration simplifiée)
             const descriptionEditor = new EasyMDE({
+                ...commonOptions,
                 element: document.getElementById('markdown-description'),
-                spellChecker: false,
                 autofocus: false,
                 placeholder: "Rédigez une description courte pour le SEO...",
-                status: false,
-                tabSize: 4,
                 minHeight: '100px',
                 maxHeight: '150px',
-                toolbar: ["bold", "italic", "|", "link", "|", "preview"],
-                autoDownloadFontAwesome: false
+                toolbar: [
+                    "bold", "italic", "|", 
+                    "link", "|", 
+                    "preview", "side-by-side", "|", 
+                    "guide"
+                ],
+                unorderedListStyle: "-",
+                orderedListStyle: "1."
             });
 
             // Éditeur Markdown pour le contenu principal (configuration complète)
             const contentEditor = new EasyMDE({
+                ...commonOptions,
                 element: document.getElementById('markdown-content'),
-                spellChecker: false,
                 autofocus: false,
                 placeholder: "Contenu de l'article (supporte le markdown)...",
-                status: false,
-                tabSize: 4,
-                toolbarTips: true,
-                minHeight: '250px',
-                toolbar: ["bold", "italic", "heading", "|", "quote", "code", "unordered-list", "ordered-list", "|", "link", "image", "|", "preview"]
+                minHeight: '300px',
+                toolbar: [
+                    "bold", "italic", "heading", "|", 
+                    "quote", "code", "unordered-list", "ordered-list", "|", 
+                    "link", "image", "table", "horizontal-rule", "|", 
+                    "preview", "side-by-side", "|", 
+                    "fullscreen", "guide"
+                ],
+                // Configuration pour les images et liens
+                uploadImage: false,
+                unorderedListStyle: "-",
+                orderedListStyle: "1."
+            });
+            
+            // Assure la compatibilité avec le mode sombre
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            if (isDarkMode) {
+                document.querySelectorAll('.EasyMDEContainer').forEach(container => {
+                    container.classList.add('dark-mode');
+                });
+            }
+            
+            // Prévisualisation automatique à la soumission
+            document.querySelector('form').addEventListener('submit', function() {
+                descriptionEditor.toTextArea();
+                contentEditor.toTextArea();
             });
         });
     </script>

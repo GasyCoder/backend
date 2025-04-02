@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class ArticleController extends Controller
 {
@@ -47,6 +47,19 @@ class ArticleController extends Controller
             'is_published' => 'boolean',
         ]);
 
+        // Préserver le Markdown brut (sans échappement)
+        $validated['content'] = $request->input('content');
+        
+        // Nettoyer le Markdown pour la description (sans supprimer la syntaxe Markdown)
+        if ($request->has('description')) {
+            $validated['description'] = $request->input('description');
+            
+            // Limiter la longueur si nécessaire en respectant la syntaxe Markdown
+            if (Str::length($validated['description']) > 255) {
+                $validated['description'] = Str::limit($validated['description'], 252, '...');
+            }
+        }
+
         // Gérer l'upload d'image
         if ($request->hasFile('cover_image')) {
             $path = $request->file('cover_image')->store('articles', 'public');
@@ -62,9 +75,12 @@ class ArticleController extends Controller
         $validated['author_id'] = auth()->id();
 
         // Gérer la date de publication
-        if ($validated['is_published'] && empty($validated['published_at'])) {
+        if (!empty($validated['is_published']) && empty($validated['published_at'])) {
             $validated['published_at'] = now();
         }
+
+        // Créer un slug basé sur le titre (à des fins d'URL)
+        $validated['slug'] = Str::slug($validated['title']);
 
         Article::create($validated);
 
@@ -85,6 +101,11 @@ class ArticleController extends Controller
      */
     public function edit(Article $article)
     {
+        // Préparer les tags pour l'affichage
+        if (is_array($article->tags)) {
+            $article->tags = implode(', ', $article->tags);
+        }
+        
         return view('admin.articles.edit', compact('article'));
     }
 
@@ -105,6 +126,19 @@ class ArticleController extends Controller
             'is_published' => 'boolean',
         ]);
 
+        // Préserver le Markdown brut
+        $validated['content'] = $request->input('content');
+        
+        // Nettoyer le Markdown pour la description (sans supprimer la syntaxe Markdown)
+        if ($request->has('description')) {
+            $validated['description'] = $request->input('description');
+            
+            // Limiter la longueur si nécessaire en respectant la syntaxe Markdown
+            if (Str::length($validated['description']) > 255) {
+                $validated['description'] = Str::limit($validated['description'], 252, '...');
+            }
+        }
+
         // Gérer l'upload d'image
         if ($request->hasFile('cover_image')) {
             // Supprimer l'ancienne image si elle existe
@@ -123,8 +157,13 @@ class ArticleController extends Controller
         }
 
         // Gérer la date de publication
-        if ($validated['is_published'] && empty($article->published_at)) {
+        if (!empty($validated['is_published']) && empty($article->published_at)) {
             $validated['published_at'] = now();
+        }
+
+        // Mettre à jour le slug si le titre a changé
+        if ($article->title !== $validated['title']) {
+            $validated['slug'] = Str::slug($validated['title']);
         }
 
         $article->update($validated);
